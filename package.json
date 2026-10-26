@@ -1,0 +1,33 @@
+{
+  "name": "handoffcheck",
+  "version": "0.1.0",
+  "description": "Check that a HANDOFF.md is still true before another agent takes over: commit, file hashes, TODO anchors, declared commands. Zero-dependency Node CLI.",
+  "type": "module",
+  "bin": {
+    "handoffcheck": "./src/cli.mjs"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/cli.mjs check HANDOFF.md",
+    "demo": "node demo/demo.mjs",
+    "test": "node --test"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "handoff",
+    "coding-agent",
+    "context",
+    "git",
+    "cli"
+  ],
+  "license": "MIT",
+  "author": "Xiao-KL"
+}
