@@ -37,7 +37,7 @@ node src/cli.mjs --help
 在一个仓库里先生成交接，再让另一个 agent 接手：
 
 ```bash
-node src/cli.mjs init --files src/checkout.mjs,src/api.mjs
+node src/cli.mjs init --files src/checkout.mjs,src/api.mjs   # 换成你自己的文件
 # ... 另一个 agent 改了代码 ...
 node src/cli.mjs check HANDOFF.md
 ```
@@ -82,29 +82,30 @@ node src/cli.mjs init --force --files src/checkout.mjs,src/api.mjs
 
 `init` 生成，三张表是唯一被 `check` 认的东西，其余文字不校验：
 
-```markdown
+````markdown
 # HANDOFF
 
 ```handoff
 schema: handoffcheck/v1
 repo: demo-repo
 branch: main
-commit: 3d8f0b1a4c72
-created: 2026-10-27T01:40:12.412Z
-author: build-worker
+commit: 99c92f183d9c
+created: 2026-10-26T16:11:58.836Z
+author: demo-agent
 ```
 
 ## Files
 
 | path | sha256 | note |
 | --- | --- | --- |
-| src/checkout.mjs | 5b81a9f0d3c2 | 退款流程实现 |
+| src/api.mjs | 2a0f696f6dfc |  |
+| src/checkout.mjs | 483ab3fdffe7 | 退款流程 |
 
 ## Anchors
 
 | path | line | snippet |
 | --- | --- | --- |
-| src/checkout.mjs | 12 | // TODO: retry on 409 |
+| src/checkout.mjs | 2 | // TODO: retry on 409 |
 
 ## Commands
 
@@ -114,11 +115,11 @@ author: build-worker
 
 ## State
 
-退款主流程跑通；重试还在 TODO。
-```
+退款主流程跑通；409 重试还在 TODO。
+````
 
 - `sha256` 是文件内容 sha256 的前 12 位，**先统一 CRLF → LF 再算**，所以 Windows 和 macOS 的 checkout 不会互相误报。
-- `Anchors` 检查的是「第 N 行还包含这段文本吗」。行号漂移会报 `moved`，文本消失报 `stale`。
+- `Anchors` 检查的是「第 N 行还包含这段文本吗」。行号漂移报 warn（`文本移到了第 N 行`），文本消失报 stale。
 - `Commands` 只有加 `--run` 才真的执行；`expect_exit` 写 `skip` 表示只记录不跑。
 
 ## 检查项
