@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import { existsSync, writeFileSync } from "node:fs";
+import { existsSync, realpathSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import {
   checkAnchors,
@@ -304,6 +304,20 @@ export function main(argv = process.argv.slice(2)) {
   }
 }
 
-const isDirectRun =
-  process.argv[1] !== undefined && import.meta.url === pathToFileURL(process.argv[1]).href;
-if (isDirectRun) process.exitCode = main();
+/** True when this file is the process entry point. Compares realpaths because
+ *  npm link / global installs reach the same file through a symlink, and a plain
+ *  URL comparison then quietly does nothing (exit 0, no output). */
+function isDirectRun() {
+  if (process.argv[1] === undefined) return false;
+  try {
+    const self = realpathSync(fileURLToPath(import.meta.url));
+    const entry = realpathSync(process.argv[1]);
+    return process.platform === "win32"
+      ? self.toLowerCase() === entry.toLowerCase()
+      : self === entry;
+  } catch {
+    return import.meta.url === pathToFileURL(process.argv[1]).href;
+  }
+}
+
+if (isDirectRun()) process.exitCode = main();
